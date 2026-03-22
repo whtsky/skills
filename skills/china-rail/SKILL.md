@@ -1,110 +1,92 @@
 ---
 name: china-rail
-description: Query 12306 China railway train schedules, timetables, station stops, and high-speed rail (高铁) information for travel planning.
-compatibility: Requires bash, curl, and access to 12306.cn.
+description: "Query 12306 China railway: train schedules, remaining tickets, station info, timetables, bureau info, and EMU (车底) data. Use when user asks about 火车/高铁/动车 tickets, schedules, availability, or train types within China."
+compatibility: Requires Node.js. No API key needed.
 ---
 
-# China Rail - 中国火车时刻表查询
+# China Rail — 中国铁路 12306 查询
 
-查询中国铁路时刻表、车次信息，数据来源 12306 官方 API。
+数据来源 12306 官方 API + api.rail.re（动车组车底）+ RailGo（普速车型/配属），无需 API key。带本地缓存（车站 7 天、余票 3 分钟、车站车次 1 小时）。
 
-## 功能
-
-- 🚉 **查询车站所有车次** ⭐ 核心功能
-- 🔍 搜索车次信息
-- 📋 查询时刻表（全部经停站）
-- 🏷️ 获取车站电报码
-
-## 使用方法
-
-### 1. 查询车站所有车次 ⭐
+## 1. 余票查询 ⭐
 
 ```bash
-bash scripts/from-station.sh <站名>
+node scripts/query.mjs <出发站> <到达站> [选项]
 ```
+
+输出自动包含**担当铁路局**。
 
 示例：
 ```bash
-bash scripts/from-station.sh 清河      # 查清河站所有车次 (1500+)
-bash scripts/from-station.sh 北京南    # 查北京南站所有车次
+node scripts/query.mjs 北京 上海 -f md
+node scripts/query.mjs 上海 杭州 -t G --depart 06:00-12:00 --max-duration 1h30m
+node scripts/query.mjs 深圳 长沙 --available --seat ze -f md
+node scripts/query.mjs 广州 武汉 --json
 ```
 
-输出按车次类型分组（G/C高铁城际、D动车、Z直达、T特快、K快速、其他）
+选项：
+- `-d, --date <YYYY-MM-DD>` 出行日期（默认今天）
+- `-t, --type <G|D|Z|T|K>` 筛选车次类型（可组合，如 GD）
+- `--depart <HH:MM-HH:MM>` 出发时间范围
+- `--arrive <HH:MM-HH:MM>` 到达时间范围
+- `--max-duration <时长>` 最长耗时（如 2h, 90m, 1h30m）
+- `--available` 仅显示可购买车次
+- `--seat <类型>` 仅显示有票车次（逗号分隔: swz,zy,ze,rw,dw,yw,yz,wz）
+- `-f, --format <html|md>` 输出格式（默认 html）
+- `--json` 输出 JSON（含 `bureau`、`bureauCode` 字段）
 
-### 2. 搜索车次
+座位代码：swz=商务座, zy=一等座, ze=二等座, rw=软卧, dw=动卧, yw=硬卧, yz=硬座, wz=无座
+
+## 2. 查车站所有车次
 
 ```bash
-bash scripts/search.sh <车次号> [日期YYYYMMDD]
+node scripts/from-station.mjs <站名> [-t GD] [--json]
 ```
+
+## 3. 查车次时刻表 + 担当局 + 车底 ⭐
+
+```bash
+node scripts/schedule.mjs <车次号> [日期] [--json] [--emu]
+```
+
+- 自动显示**担当铁路局**（从 train_no 编码推断）
+- G/D/C 字头自动查询**车底/车型**（来源 api.rail.re）
+- K/T/Z 等普速列车自动查询**车型/配属/乘务**（来源 RailGo，覆盖率约 60%）
+- 普速车可用 `--emu` 强制尝试查动车组车底（通常无数据）
+
+日期支持 `YYYY-MM-DD` 或 `YYYYMMDD`。
 
 示例：
 ```bash
-bash scripts/search.sh G1              # 查今天的 G1
-bash scripts/search.sh G1 20260207     # 查指定日期
+node scripts/schedule.mjs G1              # 自动查车底
+node scripts/schedule.mjs K1371            # 显示担当局
+node scripts/schedule.mjs D134 --json      # JSON 含 bureau + emu 字段
 ```
 
-### 3. 查询时刻表
+JSON 输出字段：
+- `bureau`: 担当铁路局名称
+- `emu.emuNo`: 车底编号（如 CR400BFS3177）
+- `emu.trainType`: 车型（如 CR400BF、CR200J）
+- `railgo.car`: 普速车型（如 25GDC600V）
+- `railgo.bureauName`: 铁路局简称
+- `railgo.carOwner`: 配属车辆段
+- `railgo.runner`: 乘务段
+- `railgo.type`: 列车类型描述
+
+## 4. 车站查询
 
 ```bash
-bash scripts/schedule.sh <车次号> [日期YYYYMMDD]
+node scripts/stations.mjs <站名/关键词> [--refresh]
 ```
 
-示例：
-```bash
-bash scripts/schedule.sh G1            # 查 G1 全部经停站
-bash scripts/schedule.sh G1053 20260207
-```
+支持中文名、拼音、简拼搜索。输入城市名会列出该城市所有车站。
 
-### 4. 查询车站电报码
+## ⚠️ 注意事项
 
-```bash
-bash scripts/station.sh <站名关键词>
-```
+**城市 vs 车站**：输入"武汉"会匹配武汉站（主站），但武汉实际有武汉站、汉口站、武昌站等多个车站。建议先用 `stations.mjs 武汉` 查看所有站，再精确查询。
 
-示例：
-```bash
-bash scripts/station.sh 北京           # 查所有北京相关站点
-bash scripts/station.sh 济南
-```
+**换乘**：同站换乘建议预留 20-30 分钟；不同站需额外地铁时间。用 `--json` 确认出发/到达的精确站名。
 
-## API 说明
+**余票限制**：12306 仅提供预售期内（一般 15 天）的余票数据。当日过了售票时段查不到。
 
-### 车站车次查询 (核心)
-```
-POST https://www.12306.cn/index/otn/zwdch/queryCC
-参数：train_station_code (电报码，如 QIP)
-返回：JSON，data 数组包含所有车次代码
-```
-
-### 车次搜索
-```
-GET https://search.12306.cn/search/v1/train/search
-参数：keyword (车次号), date (YYYYMMDD)
-```
-
-### 时刻表查询
-```
-GET https://kyfw.12306.cn/otn/czxx/queryByTrainNo
-参数：train_no, from_station_telecode, to_station_telecode, depart_date
-```
-
-### 车站电报码
-```
-GET https://kyfw.12306.cn/otn/resources/js/framework/station_name.js
-```
-
-## 常用站点电报码
-
-| 站名 | 电报码 | 站名 | 电报码 |
-|-----|-------|-----|-------|
-| 北京 | BJP | 上海 | SHH |
-| 北京南 | VNP | 上海虹桥 | AOH |
-| 北京西 | BXP | 广州南 | IZQ |
-| 北京朝阳 | IFP | 深圳北 | IOQ |
-| 清河 | QIP | 天津 | TJP |
-
-## 注意事项
-
-- 请求频率建议 > 1 秒间隔（防止触发反爬）
-- 数据以 12306 官网为准
-- 车次列表是静态的（不包含具体日期的运行计划）
+**车底/车型数据**：动车组（G/D/C）车底信息来源 api.rail.re（第三方），车底每天可能更换，显示的是当日实际运用数据。普速列车（K/T/Z 等）车型/配属信息来源 RailGo（第三方个人项目），覆盖率约 60%（K 字头 53%，T 字头 68%，Z 字头 82%），查不到时不显示。
