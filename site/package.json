@@ -1,0 +1,25 @@
+{
+  "name": "skills-site",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "format": "prettier --write . ../skills/**/*.mjs",
+    "format:check": "prettier --check . ../skills/**/*.mjs",
+    "sync:readme": "node scripts/sync-readme.mjs",
+    "check:readme": "node scripts/sync-readme.mjs --check",
+    "verify": "npm run format:check && npm run check:readme && npm run build"
+  },
+  "dependencies": {
+    "astro": "^5.7.0",
+    "@astrojs/sitemap": "^3.3.0"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "prettier": "^3.5.0",
+    "prettier-plugin-astro": "^0.14.0",
+    "vitest": "^3.1.0"
+  }
+}

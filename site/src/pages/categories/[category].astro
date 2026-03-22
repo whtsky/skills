@@ -1,0 +1,97 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import SkillCard from "../../components/SkillCard.astro";
+import {
+  normalizeAll,
+  groupBy,
+  CATEGORY_LABELS,
+  MIN_LANDING_PAGE_SKILLS,
+} from "../../lib/catalog";
+import type { NormalizedSkill } from "../../lib/catalog";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("skills");
+  const skills = normalizeAll(entries);
+  const byCategory = groupBy(skills, (s) => s.category);
+  return [...byCategory.entries()]
+    .filter(([_, items]) => items.length >= MIN_LANDING_PAGE_SKILLS)
+    .map(([category, skills]) => ({
+      params: { category },
+      props: {
+        category,
+        skills,
+        label: CATEGORY_LABELS[category] ?? category,
+      },
+    }));
+}
+
+interface Props {
+  category: string;
+  skills: NormalizedSkill[];
+  label: string;
+}
+
+const { category, skills, label } = Astro.props;
+
+const CATEGORY_INTROS: Record<string, string> = {
+  weather:
+    "Real-time conditions, forecasts, alerts, and air quality data from regional and global weather services.",
+  travel:
+    "Maps, transportation, hotel search, and route planning for trips in Asia and beyond.",
+  food: "Restaurant discovery, ratings, reviews, and reservation tools across Japan and Singapore.",
+  media:
+    "Video content extraction, transcription, and article publishing tools.",
+  fitness: "Training load analysis, wellness tracking, and workout management.",
+  gaming:
+    "Game compatibility checking and community reports for Linux and Steam Deck.",
+  utility:
+    "Web scraping, search, and infrastructure tools for building on top of other skills.",
+};
+
+const intro = CATEGORY_INTROS[category] ?? "";
+const description = `${label} agent skills for AI assistants. ${intro}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: `${label} Skills`,
+  description,
+  url: new URL(`/categories/${category}/`, Astro.site).href,
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: skills.length,
+    itemListElement: skills.map((s, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: s.name,
+      url: new URL(`/skills/${s.slug}/`, Astro.site).href,
+    })),
+  },
+};
+---
+
+<Base title={`${label} Skills`} description={description} jsonLd={jsonLd}>
+  <nav class="breadcrumb">
+    <a href="/skills/">Skills</a> / <span>{label}</span>
+  </nav>
+
+  <h1>{label} Skills</h1>
+  {intro && <p class="page-description">{intro}</p>}
+  <p>{skills.length} skill{skills.length !== 1 ? "s" : ""} in this category.</p>
+
+  <div class="skill-grid">
+    {skills.map((s) => <SkillCard skill={s} />)}
+  </div>
+</Base>
+
+<style>
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+  .breadcrumb span {
+    color: var(--color-text);
+  }
+</style>

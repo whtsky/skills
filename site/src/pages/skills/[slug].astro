@@ -1,0 +1,140 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import {
+  normalizeSkill,
+  CATEGORY_LABELS,
+  REGION_LABELS,
+} from "../../lib/catalog";
+import type { NormalizedSkill } from "../../lib/catalog";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("skills");
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const skill: NormalizedSkill = normalizeSkill(entry);
+const { Content } = await render(entry);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  name: skill.name,
+  description: skill.description,
+  codeRepository: skill.sourceUrl,
+  keywords: skill.tags.join(", "),
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Skills",
+      item: new URL("/skills/", Astro.site).href,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: skill.name,
+      item: new URL(`/skills/${skill.slug}/`, Astro.site).href,
+    },
+  ],
+};
+---
+
+<Base title={skill.name} description={skill.description} jsonLd={jsonLd}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+  <nav class="breadcrumb">
+    <a href="/skills/">Skills</a> / <span>{skill.name}</span>
+  </nav>
+
+  <h1>{skill.name}</h1>
+  <p class="page-description">{skill.description}</p>
+
+  <div class="meta-section">
+    <div class="badges">
+      <a class="badge" href={`/categories/${skill.category}/`}>
+        {CATEGORY_LABELS[skill.category] ?? skill.category}
+      </a>
+      {
+        skill.regions.map((r) => (
+          <a class="badge" href={`/regions/${r}/`}>
+            {REGION_LABELS[r] ?? r}
+          </a>
+        ))
+      }
+      {
+        skill.tags.map((t) => (
+          <a class="badge" href={`/tags/${t}/`}>
+            {t}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  {
+    skill.compatibility && (
+      <section class="requirements">
+        <h2>Requirements</h2>
+        <p>{skill.compatibility}</p>
+      </section>
+    )
+  }
+
+  <section class="install">
+    <h2>Install</h2>
+    <pre><code>npx skills add whtsky/skills -s {skill.slug}</code></pre>
+  </section>
+
+  <section
+    class="skill-body"
+    lang={skill.bodyLang !== "en" ? skill.bodyLang : undefined}
+  >
+    <Content />
+  </section>
+
+  <section class="source">
+    <p>
+      <a href={skill.sourceUrl}>View source on GitHub &rarr;</a>
+    </p>
+  </section>
+</Base>
+
+<style>
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+  .breadcrumb span {
+    color: var(--color-text);
+  }
+  .meta-section {
+    margin-bottom: 1.5rem;
+  }
+  .requirements {
+    margin-bottom: 1rem;
+  }
+  .install pre {
+    display: inline-block;
+  }
+  .skill-body {
+    border-top: 1px solid var(--color-border);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .source {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+</style>

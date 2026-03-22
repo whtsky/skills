@@ -1,0 +1,6 @@
+dist/
+node_modules/
+.astro/
+
+# Skill markdown is consumed by agents — avoid padding tables with spaces
+../skills/**/*.md

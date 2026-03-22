@@ -1,0 +1,92 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import SkillCard from "../../components/SkillCard.astro";
+import {
+  normalizeAll,
+  groupBy,
+  REGION_LABELS,
+  MIN_LANDING_PAGE_SKILLS,
+} from "../../lib/catalog";
+import type { NormalizedSkill } from "../../lib/catalog";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("skills");
+  const skills = normalizeAll(entries);
+  const byRegion = groupBy(skills, (s) => s.regions);
+  return [...byRegion.entries()]
+    .filter(([_, items]) => items.length >= MIN_LANDING_PAGE_SKILLS)
+    .map(([region, skills]) => ({
+      params: { region },
+      props: {
+        region,
+        skills,
+        label: REGION_LABELS[region] ?? region,
+      },
+    }));
+}
+
+interface Props {
+  region: string;
+  skills: NormalizedSkill[];
+  label: string;
+}
+
+const { region, skills, label } = Astro.props;
+
+const REGION_INTROS: Record<string, string> = {
+  cn: "Agent skills for services and APIs specific to mainland China — weather, maps, rail, video, and more.",
+  jp: "Agent skills for Japan — ski conditions, hotel booking, restaurant reviews, and reservations.",
+  global:
+    "Agent skills that work worldwide — hiking weather, fitness tracking, game compatibility, and utilities.",
+  sg: "Agent skills covering Singapore — restaurant search and reservations.",
+};
+
+const intro = REGION_INTROS[region] ?? "";
+const description = `${label} agent skills for AI assistants. ${intro}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: `${label} Skills`,
+  description,
+  url: new URL(`/regions/${region}/`, Astro.site).href,
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: skills.length,
+    itemListElement: skills.map((s, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: s.name,
+      url: new URL(`/skills/${s.slug}/`, Astro.site).href,
+    })),
+  },
+};
+---
+
+<Base title={`${label} Skills`} description={description} jsonLd={jsonLd}>
+  <nav class="breadcrumb">
+    <a href="/skills/">Skills</a> / <span>{label}</span>
+  </nav>
+
+  <h1>{label} Skills</h1>
+  {intro && <p class="page-description">{intro}</p>}
+  <p>
+    {skills.length} skill{skills.length !== 1 ? "s" : ""} available for this region.
+  </p>
+
+  <div class="skill-grid">
+    {skills.map((s) => <SkillCard skill={s} />)}
+  </div>
+</Base>
+
+<style>
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+  .breadcrumb span {
+    color: var(--color-text);
+  }
+</style>

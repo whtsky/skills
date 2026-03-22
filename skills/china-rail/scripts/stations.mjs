@@ -2,17 +2,18 @@
 // 车站数据管理：加载、缓存、查询、模糊匹配
 // 共享模块，供 query.mjs / from-station.mjs / schedule.mjs 使用
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, '..', 'data');
-const CACHE_FILE = join(DATA_DIR, 'stations.json');
+const DATA_DIR = join(__dirname, "..", "data");
+const CACHE_FILE = join(DATA_DIR, "stations.json");
 const CACHE_TTL = 7 * 24 * 3600 * 1000; // 7 天
 
-const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
-const HEADERS = { 'User-Agent': UA };
+const UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+const HEADERS = { "User-Agent": UA };
 
 // ============================================================
 // 公开接口
@@ -25,12 +26,14 @@ const HEADERS = { 'User-Agent': UA };
 export async function loadStations(forceRefresh = false) {
   if (!forceRefresh && existsSync(CACHE_FILE)) {
     try {
-      const cached = JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
+      const cached = JSON.parse(readFileSync(CACHE_FILE, "utf-8"));
       if (Date.now() - cached.ts < CACHE_TTL) return cached.data;
-    } catch { /* 缓存损坏，重新获取 */ }
+    } catch {
+      /* 缓存损坏，重新获取 */
+    }
   }
 
-  console.error('正在从 12306 获取车站数据...');
+  console.error("正在从 12306 获取车站数据...");
   const raw = await fetchStationScript();
   const data = parseStationData(raw);
 
@@ -54,7 +57,7 @@ export function resolveStation(data, name) {
   if (data.CITY_STATIONS[name]) return data.CITY_STATIONS[name][0];
 
   // 4. 去掉"市""站"后缀再试
-  const trimmed = name.replace(/[市站]$/, '');
+  const trimmed = name.replace(/[市站]$/, "");
   if (trimmed !== name) {
     if (data.NAME_STATIONS[trimmed]) return data.NAME_STATIONS[trimmed];
     if (data.CITY_CODES[trimmed]) return data.CITY_CODES[trimmed];
@@ -75,7 +78,7 @@ export function getStationCode(data, name) {
  * 列出某城市的全部车站
  */
 export function listCityStations(data, cityName) {
-  const trimmed = cityName.replace(/[市站]$/, '');
+  const trimmed = cityName.replace(/[市站]$/, "");
   return data.CITY_STATIONS[cityName] || data.CITY_STATIONS[trimmed] || [];
 }
 
@@ -104,13 +107,17 @@ export function searchStations(data, keyword) {
 
 async function fetchStationScript() {
   // 先从首页获取版本号，避免缓存问题
-  const homeRes = await fetch('https://www.12306.cn/index/', { headers: HEADERS });
+  const homeRes = await fetch("https://www.12306.cn/index/", {
+    headers: HEADERS,
+  });
   const homeHtml = await homeRes.text();
 
-  const versionMatch = homeHtml.match(/station_name\.js\?station_version=([\d.]+)/);
+  const versionMatch = homeHtml.match(
+    /station_name\.js\?station_version=([\d.]+)/,
+  );
   const jsUrl = versionMatch
     ? `https://www.12306.cn/index/script/station_name.js?station_version=${versionMatch[1]}`
-    : 'https://kyfw.12306.cn/otn/resources/js/framework/station_name.js';
+    : "https://kyfw.12306.cn/otn/resources/js/framework/station_name.js";
 
   const jsRes = await fetch(jsUrl, { headers: HEADERS });
   return jsRes.text();
@@ -119,26 +126,36 @@ async function fetchStationScript() {
 function parseStationData(jsText) {
   // 格式: @bjb|北京北|VAP|beijingbei|bjb|0|0357|北京|||
   //        [0]  [1]   [2]   [3]     [4] [5] [6] [7]
-  const raw = jsText.match(/'([^']+)'/)?.[1] || '';
-  const entries = raw.split('@').filter(Boolean);
+  const raw = jsText.match(/'([^']+)'/)?.[1] || "";
+  const entries = raw.split("@").filter(Boolean);
 
-  const STATIONS = {};      // code → 完整站点对象
+  const STATIONS = {}; // code → 完整站点对象
   const CITY_STATIONS = {}; // 城市名 → 站点数组
   const NAME_STATIONS = {}; // 站名 → {station_code, station_name}
-  const CITY_CODES = {};    // 城市名 → 主站对象（站名===城市名的那个）
+  const CITY_CODES = {}; // 城市名 → 主站对象（站名===城市名的那个）
 
   for (const entry of entries) {
-    const parts = entry.split('|');
+    const parts = entry.split("|");
     const [, name, code, pinyin, shortPy, , , city] = parts;
     const cityName = city || name;
     if (!name || !code) continue;
 
-    const full = { station_name: name, station_code: code, station_pinyin: pinyin, station_short: shortPy, city: cityName };
+    const full = {
+      station_name: name,
+      station_code: code,
+      station_pinyin: pinyin,
+      station_short: shortPy,
+      city: cityName,
+    };
     STATIONS[code] = full;
     NAME_STATIONS[name] = { station_code: code, station_name: name };
-    (CITY_STATIONS[cityName] ??= []).push({ station_code: code, station_name: name });
+    (CITY_STATIONS[cityName] ??= []).push({
+      station_code: code,
+      station_name: name,
+    });
     // 主站：站名和城市名相同
-    if (name === cityName) CITY_CODES[cityName] = { station_code: code, station_name: name };
+    if (name === cityName)
+      CITY_CODES[cityName] = { station_code: code, station_name: name };
   }
 
   return { STATIONS, CITY_STATIONS, NAME_STATIONS, CITY_CODES };
@@ -148,14 +165,14 @@ function parseStationData(jsText) {
 // CLI 模式
 // ============================================================
 
-const isMainModule = process.argv[1] && (
-  process.argv[1].endsWith('stations.mjs') ||
-  process.argv[1] === fileURLToPath(import.meta.url)
-);
+const isMainModule =
+  process.argv[1] &&
+  (process.argv[1].endsWith("stations.mjs") ||
+    process.argv[1] === fileURLToPath(import.meta.url));
 
 if (isMainModule && process.argv[2]) {
   const keyword = process.argv[2];
-  const forceRefresh = process.argv.includes('--refresh');
+  const forceRefresh = process.argv.includes("--refresh");
   const data = await loadStations(forceRefresh);
 
   // 先尝试精确解析
@@ -184,8 +201,8 @@ if (isMainModule && process.argv[2]) {
     if (results.length > 30) console.log(`  ... 共 ${results.length} 个`);
   }
 } else if (isMainModule) {
-  console.error('用法: node stations.mjs <站名/关键词> [--refresh]');
-  console.error('示例: node stations.mjs 北京');
-  console.error('      node stations.mjs 武汉 --refresh');
+  console.error("用法: node stations.mjs <站名/关键词> [--refresh]");
+  console.error("示例: node stations.mjs 北京");
+  console.error("      node stations.mjs 武汉 --refresh");
   process.exit(1);
 }

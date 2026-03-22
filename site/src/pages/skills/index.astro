@@ -1,0 +1,41 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import SkillCard from "../../components/SkillCard.astro";
+import { normalizeAll } from "../../lib/catalog";
+
+const entries = await getCollection("skills");
+const skills = normalizeAll(entries);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "All Agent Skills",
+  description: `Browse all ${skills.length} agent skills for AI assistants.`,
+  url: new URL("/skills/", Astro.site).href,
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: skills.length,
+    itemListElement: skills.map((s, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: s.name,
+      url: new URL(`/skills/${s.slug}/`, Astro.site).href,
+    })),
+  },
+};
+---
+
+<Base
+  title="All Skills"
+  description={`Browse all ${skills.length} agent skills for AI assistants.`}
+  jsonLd={jsonLd}
+>
+  <h1>All Skills</h1>
+  <p class="page-description">
+    {skills.length} agent skills for AI assistants.
+  </p>
+  <div class="skill-grid">
+    {skills.map((s) => <SkillCard skill={s} />)}
+  </div>
+</Base>

@@ -1,0 +1,73 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import SkillCard from "../../components/SkillCard.astro";
+import {
+  normalizeAll,
+  groupBy,
+  MIN_LANDING_PAGE_SKILLS,
+} from "../../lib/catalog";
+import type { NormalizedSkill } from "../../lib/catalog";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("skills");
+  const skills = normalizeAll(entries);
+  const byTag = groupBy(skills, (s) => s.tags);
+  return [...byTag.entries()]
+    .filter(([_, items]) => items.length >= MIN_LANDING_PAGE_SKILLS)
+    .map(([tag, skills]) => ({
+      params: { tag },
+      props: { tag, skills },
+    }));
+}
+
+interface Props {
+  tag: string;
+  skills: NormalizedSkill[];
+}
+
+const { tag, skills } = Astro.props;
+const description = `Agent skills tagged "${tag}" — ${skills.map((s) => s.name).join(", ")}.`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: `Skills tagged "${tag}"`,
+  description,
+  url: new URL(`/tags/${tag}/`, Astro.site).href,
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: skills.length,
+    itemListElement: skills.map((s, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: s.name,
+      url: new URL(`/skills/${s.slug}/`, Astro.site).href,
+    })),
+  },
+};
+---
+
+<Base title={`"${tag}" Skills`} description={description} jsonLd={jsonLd}>
+  <nav class="breadcrumb">
+    <a href="/skills/">Skills</a> / <span>Tag: {tag}</span>
+  </nav>
+
+  <h1>Skills tagged &ldquo;{tag}&rdquo;</h1>
+  <p>{skills.length} skill{skills.length !== 1 ? "s" : ""} with this tag.</p>
+
+  <div class="skill-grid">
+    {skills.map((s) => <SkillCard skill={s} />)}
+  </div>
+</Base>
+
+<style>
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+  .breadcrumb span {
+    color: var(--color-text);
+  }
+</style>
