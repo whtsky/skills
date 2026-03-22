@@ -2,6 +2,10 @@
 name: amap
 description: 高德地图 (Amap/Gaode Maps) API for China POI search, geocoding, route planning, navigation, nearby places, administrative regions, IP geolocation, and coordinate conversion.
 compatibility: Requires python3 with requests library and AMAP_API_KEY environment variable.
+metadata:
+  category: travel
+  region: cn
+  tags: maps, navigation, poi, geocoding, routing, gaode, china
 ---
 
 # 高德地图 Skill

@@ -2,6 +2,10 @@
 name: china-rail
 description: "Query 12306 China railway: train schedules, remaining tickets, station info, timetables, bureau info, and EMU (车底) data. Use when user asks about 火车/高铁/动车 tickets, schedules, availability, or train types within China."
 compatibility: Requires Node.js. No API key needed.
+metadata:
+  category: travel
+  region: cn
+  tags: trains, railway, 12306, tickets, schedule, high-speed-rail, china
 ---
 
 # China Rail — 中国铁路 12306 查询

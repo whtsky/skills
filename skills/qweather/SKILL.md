@@ -2,6 +2,10 @@
 name: qweather
 description: Query QWeather (和风天气) API for China weather — real-time conditions, daily/hourly forecasts, severe weather alerts, air quality, life indices, minute-level precipitation, and city geo-lookup.
 compatibility: Requires curl, QWEATHER_API_KEY and QWEATHER_API_HOST environment variables.
+metadata:
+  category: weather
+  region: cn
+  tags: weather, forecast, alerts, air-quality, qweather, china
 ---
 
 # 和风天气 QWeather Skill

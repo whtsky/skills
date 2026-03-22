@@ -2,6 +2,10 @@
 name: flaresolverr
 description: Bypass Cloudflare anti-bot protection and 403 challenges using a FlareSolverr proxy to scrape blocked websites.
 compatibility: Requires a running FlareSolverr instance and curl.
+metadata:
+  category: utility
+  region: global
+  tags: anti-bot, cloudflare, scraping, proxy, web
 ---
 
 # FlareSolverr

@@ -2,6 +2,10 @@
 name: tabelog
 description: Search and browse Tabelog for Japan restaurant ratings, reviews, reservations, and recommendations by region, cuisine category, or station area.
 compatibility: Requires python3 and access to tabelog.com.
+metadata:
+  category: food
+  region: jp
+  tags: restaurants, reviews, ratings, dining, japan
 ---
 
 # Tabelog - Japan Restaurant Search

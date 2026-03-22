@@ -2,6 +2,10 @@
 name: searxng
 description: Search the web using a self-hosted SearXNG meta-search engine with privacy-focused, multi-engine aggregated results via curl.
 compatibility: Requires a running SearXNG instance and curl.
+metadata:
+  category: utility
+  region: global
+  tags: search, meta-search, privacy, web-search, self-hosted
 ---
 
 # SearXNG Search

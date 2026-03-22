@@ -2,6 +2,10 @@
 name: japan-ski-weather
 description: Fetch Japan ski resort weather forecasts, snow depth, and snow conditions from tenki.jp for ski trip planning.
 compatibility: Requires python3 and access to tenki.jp.
+metadata:
+  category: weather
+  region: jp
+  tags: weather, ski, snow, resort, japan, winter-sports
 ---
 
 # Japan Ski Weather

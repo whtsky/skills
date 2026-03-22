@@ -2,6 +2,10 @@
 name: hiking-weather
 description: "Hiking and mountain weather forecasts using Open-Meteo pressure level data. Use when planning a hike, trek, or mountain climb and needing altitude-specific weather (temperature, wind, cloud layers, visibility, freezing level, precipitation by elevation). Supports GPX route files for automatic waypoint extraction. Triggers: hiking weather, mountain weather, trail forecast, summit conditions, should I hike tomorrow, is it safe to hike, cloud altitude, wind at summit, freezing level."
 compatibility: Requires python3 and curl. Uses Open-Meteo API (free, no key needed).
+metadata:
+  category: weather
+  region: global
+  tags: weather, hiking, mountain, altitude, outdoor, trekking, open-meteo
 ---
 
 # Hiking Weather

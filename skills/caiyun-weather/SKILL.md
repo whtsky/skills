@@ -2,6 +2,10 @@
 name: caiyun-weather
 description: Query Caiyun (ColorfulClouds) weather API for mainland China — real-time conditions, minute-level precipitation, hourly/daily forecasts, severe weather alerts, air quality (AQI), and GCJ-02 coordinate conversion.
 compatibility: Requires curl and CAIYUN_API_TOKEN environment variable.
+metadata:
+  category: weather
+  region: cn
+  tags: weather, forecast, precipitation, aqi, alerts, caiyun, china
 ---
 
 # 彩云天气 Skill

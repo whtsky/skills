@@ -2,6 +2,10 @@
 name: rakuten-travel
 description: Search and compare Japan hotels on Rakuten Travel with room availability, real pricing, and reviews via the Rakuten API.
 compatibility: Requires curl, jq, and APPLICATION_ID (Rakuten API Key) environment variable.
+metadata:
+  category: travel
+  region: jp
+  tags: hotels, accommodation, booking, rakuten, japan
 ---
 
 # Rakuten Travel

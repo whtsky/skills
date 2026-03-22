@@ -2,6 +2,10 @@
 name: protondb
 description: Check Steam Deck / Linux game compatibility via ProtonDB. Use when user asks about Steam Deck compatibility, Proton ratings, or Linux gaming support for specific games. Provides summary ratings and detailed user reports.
 compatibility: Requires curl, node (for hash computation), and python3. No API key needed.
+metadata:
+  category: gaming
+  region: global
+  tags: gaming, steam-deck, linux, proton, compatibility, steam
 ---
 
 # ProtonDB

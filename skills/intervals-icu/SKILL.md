@@ -9,6 +9,10 @@ description: >-
   Intervals.icu API key. Supports all activity types (cycling, running, swimming, hiking,
   strength training, etc.).
 compatibility: Requires curl or any HTTP client. ICU_API_KEY environment variable (generate at intervals.icu → Settings → Developer Settings).
+metadata:
+  category: fitness
+  region: global
+  tags: fitness, training, cycling, running, power, heart-rate, ctl, atl, tsb
 ---
 
 # Intervals.icu API

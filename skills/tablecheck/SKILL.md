@@ -8,6 +8,10 @@ description: >-
   Availability checks work for any restaurant using TableCheck as their booking system,
   including outside Japan/Singapore (e.g., Sorn Bangkok).
 compatibility: Requires python3 with requests. Playwright needed for availability checks (auto-installed via uvx).
+metadata:
+  category: food
+  region: jp, sg, global
+  tags: restaurants, reservations, booking, dining, tablecheck
 ---
 
 # TableCheck — Restaurant Search & Reservations

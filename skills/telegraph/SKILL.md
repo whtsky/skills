@@ -2,6 +2,10 @@
 name: telegraph
 description: Create and edit Telegraph (telegra.ph) pages with rich formatting, images, and Telegram Instant View support for publishing articles and digests.
 compatibility: Requires curl and TELEGRAPH_TOKEN environment variable.
+metadata:
+  category: media
+  region: global
+  tags: publishing, articles, telegram, rich-text, instant-view
 ---
 
 # Telegraph Publishing

@@ -2,6 +2,10 @@
 name: bilibili
 description: Extract and transcribe Bilibili (B站) video content via subtitles or Groq Whisper audio transcription for summarization and analysis.
 compatibility: Requires bash, curl, jq, BILIBILI_SESSDATA. Optional: yt-dlp and Groq API for audio transcription fallback.
+metadata:
+  category: media
+  region: cn
+  tags: video, transcription, subtitles, bilibili, china
 ---
 
 # Bilibili 视频内容获取
