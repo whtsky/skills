@@ -12,15 +12,7 @@ const skills = defineCollection({
     description: z.string(),
     compatibility: z.string().optional().default(""),
     metadata: z.object({
-      category: z.enum([
-        "weather",
-        "travel",
-        "food",
-        "media",
-        "fitness",
-        "gaming",
-        "utility",
-      ]),
+      category: z.string(),
       region: z.string(),
       tags: z.string(),
     }),

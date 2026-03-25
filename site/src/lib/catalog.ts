@@ -1,15 +1,5 @@
 import type { CollectionEntry } from "astro:content";
 
-export const CATEGORY_ORDER = [
-  "weather",
-  "travel",
-  "food",
-  "media",
-  "fitness",
-  "gaming",
-  "utility",
-] as const;
-
 export const CATEGORY_LABELS: Record<string, string> = {
   weather: "Weather",
   travel: "Travel & Maps",
@@ -27,7 +17,7 @@ export const REGION_LABELS: Record<string, string> = {
   global: "Global",
 };
 
-export type SkillCategory = (typeof CATEGORY_ORDER)[number];
+export type SkillCategory = string;
 
 export interface NormalizedSkill {
   slug: string;
@@ -107,3 +97,15 @@ export function groupBy<K extends string>(
 
 /** Minimum number of skills to generate a landing page */
 export const MIN_LANDING_PAGE_SKILLS = 1;
+
+/**
+ * Return all category keys from the map, sorted by skill count (descending),
+ * then alphabetically for ties.
+ */
+export function orderedCategories(
+  byCategory: Map<string, NormalizedSkill[]>,
+): string[] {
+  return [...byCategory.entries()]
+    .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+    .map(([cat]) => cat);
+}

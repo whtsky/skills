@@ -23,16 +23,6 @@ const README_PATH = path.join(REPO_ROOT, "README.md");
 const START_MARKER = "<!-- SKILLS_CATALOG:START -->";
 const END_MARKER = "<!-- SKILLS_CATALOG:END -->";
 
-const CATEGORY_ORDER = [
-  "weather",
-  "travel",
-  "food",
-  "media",
-  "fitness",
-  "gaming",
-  "utility",
-];
-
 const CATEGORY_LABELS = {
   weather: "Weather",
   travel: "Travel & Maps",
@@ -108,11 +98,17 @@ function generateCatalog(skills) {
 
   const lines = [];
 
-  for (const cat of CATEGORY_ORDER) {
+  // Sort categories by skill count (descending), then alphabetically for ties
+  const allCats = [...byCategory.entries()]
+    .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+    .map(([cat]) => cat);
+
+  for (const cat of allCats) {
     const catSkills = byCategory.get(cat);
     if (!catSkills?.length) continue;
 
-    lines.push(`### ${CATEGORY_LABELS[cat]}`);
+    const label = CATEGORY_LABELS[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
+    lines.push(`### ${label}`);
     lines.push("");
     lines.push("| Skill | Region | Description | Dependencies |");
     lines.push("|-------|--------|-------------|--------------|");

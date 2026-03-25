@@ -17,13 +17,17 @@ cd site && npm run sync:readme
 
 When creating or updating a skill, ensure its `SKILL.md` frontmatter includes a `metadata` block with:
 
-- `category` — functional group (weather, travel, food, media, fitness, gaming, utility)
+- `category` — functional group. Current values include weather, travel, food, media, fitness, gaming, utility — but these are not fixed. Add new categories when a skill doesn't fit existing ones, and consolidate or rename categories when it makes sense.
 - `region` — geographic scope (cn, jp, global, or comma-separated like `jp, sg, global`)
 - `tags` — comma-separated search keywords
 
 ## Website
 
 The site under `site/` reads `SKILL.md` files directly — no separate content to maintain. Adding a new skill or updating frontmatter automatically updates the website on the next build.
+
+## Skill Review
+
+When adding, editing, or migrating a skill, review it against the checklist in `.claude/skills/skill-review/SKILL.md`. This covers frontmatter completeness, body structure, code organization, and consistency rules.
 
 ## Formatting
 

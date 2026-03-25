@@ -5,7 +5,7 @@ import SkillCard from "../components/SkillCard.astro";
 import {
   normalizeAll,
   groupBy,
-  CATEGORY_ORDER,
+  orderedCategories,
   CATEGORY_LABELS,
   REGION_LABELS,
 } from "../lib/catalog";
@@ -13,12 +13,13 @@ import {
 const entries = await getCollection("skills");
 const skills = normalizeAll(entries);
 const byCategory = groupBy(skills, (s) => s.category);
+const categories = orderedCategories(byCategory);
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Agent Skills",
-  description: `A collection of ${skills.length} agent skills for AI assistants — weather, travel, food, and more.`,
+  description: `${skills.length}+ ready-to-use agent skills for weather, travel, restaurants, gaming & more — works with OpenClaw, Claude Code, Cursor, and more.`,
   url: Astro.site?.href,
   mainEntity: {
     "@type": "ItemList",
@@ -41,14 +42,14 @@ for (const s of skills) {
 ---
 
 <Base
-  title="Agent Skills"
-  description={`A collection of ${skills.length} agent skills for AI assistants — weather, travel, food, and more.`}
+  title="Agent Skills Catalog"
+  description={`${skills.length}+ ready-to-use agent skills for weather, travel, restaurants, gaming & more — works with OpenClaw, Claude Code, Cursor, and more.`}
   jsonLd={jsonLd}
 >
   <h1>Agent Skills</h1>
   <p class="page-description">
-    A collection of {skills.length} agent skills for AI assistants. Weather, travel,
-    restaurants, media, and more.
+    A collection of {skills.length} agent skills for weather, travel, restaurants,
+    media, and more by <a href="https://blog.whtsky.me?utm_source=skills.whtsky.me&utm_medium=web&utm_campaign=agent-skills" data-umami-event="click-author">whtsky</a>. Works with <a href="https://openclaw.ai" data-umami-event="click-openclaw">OpenClaw</a>, <a href="https://claude.ai/code" data-umami-event="click-claude-code">Claude Code</a>, <a href="https://cursor.sh" data-umami-event="click-cursor">Cursor</a>, and more.
   </p>
 
   <section class="install-section">
@@ -66,11 +67,11 @@ for (const s of skills) {
         <h3>By Category</h3>
         <div class="badges">
           {
-            CATEGORY_ORDER.map((cat) => {
+            categories.map((cat) => {
               const count = byCategory.get(cat)?.length ?? 0;
               return count > 0 ? (
                 <a class="badge" href={`/categories/${cat}/`}>
-                  {CATEGORY_LABELS[cat]} ({count})
+                  {CATEGORY_LABELS[cat] ?? cat} ({count})
                 </a>
               ) : null;
             })
@@ -95,13 +96,13 @@ for (const s of skills) {
   </section>
 
   {
-    CATEGORY_ORDER.map((cat) => {
+    categories.map((cat) => {
       const catSkills = byCategory.get(cat);
       if (!catSkills?.length) return null;
       return (
         <section>
           <h2>
-            <a href={`/categories/${cat}/`}>{CATEGORY_LABELS[cat]}</a>
+            <a href={`/categories/${cat}/`}>{CATEGORY_LABELS[cat] ?? cat}</a>
           </h2>
           <div class="skill-grid">
             {catSkills.map((s) => (
