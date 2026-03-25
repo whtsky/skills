@@ -5,7 +5,7 @@ compatibility: Requires python3 and access to tenki.jp.
 metadata:
   category: weather
   region: jp
-  tags: weather, ski, snow, resort, japan, winter-sports
+  tags: forecast, ski, snow, resort, japan, winter-sports
 ---
 
 # Japan Ski Weather

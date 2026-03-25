@@ -51,7 +51,7 @@ metadata:
 | `compatibility` | Exists, lists all runtime dependencies |
 | `metadata.category` | Exists. Use an existing category when possible; create a new one if nothing fits. When introducing a new category, add its display label to `CATEGORY_LABELS` in `site/src/lib/catalog.ts` and `site/scripts/sync-readme.mjs`. |
 | `metadata.region` | Exists, valid region code(s) |
-| `metadata.tags` | Exists, includes relevant search keywords |
+| `metadata.tags` | Exists, includes relevant search keywords. Do NOT repeat the category name as a tag (e.g. no `weather` tag on a skill with `category: weather`) — it's redundant. |
 
 ### 2. Body structure
 

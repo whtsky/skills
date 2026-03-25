@@ -5,7 +5,7 @@ compatibility: Requires curl, QWEATHER_API_KEY and QWEATHER_API_HOST environment
 metadata:
   category: weather
   region: cn
-  tags: weather, forecast, alerts, air-quality, qweather, china
+  tags: forecast, alerts, air-quality, qweather, china
 ---
 
 # 和风天气 QWeather Skill

@@ -5,7 +5,7 @@ compatibility: Requires curl and CAIYUN_API_TOKEN environment variable.
 metadata:
   category: weather
   region: cn
-  tags: weather, forecast, precipitation, aqi, alerts, caiyun, china
+  tags: forecast, precipitation, aqi, alerts, caiyun, china
 ---
 
 # 彩云天气 Skill

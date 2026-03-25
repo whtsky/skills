@@ -5,7 +5,7 @@ compatibility: Requires python3 and curl. Uses Open-Meteo API (free, no key need
 metadata:
   category: weather
   region: global
-  tags: weather, hiking, mountain, altitude, outdoor, trekking, open-meteo
+  tags: forecast, hiking, mountain, altitude, outdoor, trekking, open-meteo
 ---
 
 # Hiking Weather

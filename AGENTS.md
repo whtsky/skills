@@ -27,7 +27,7 @@ The site under `site/` reads `SKILL.md` files directly — no separate content t
 
 ## Skill Review
 
-When adding, editing, or migrating a skill, review it against the checklist in `.claude/skills/skill-review/SKILL.md`. This covers frontmatter completeness, body structure, code organization, and consistency rules.
+When you add, edit, copy, or migrate any skill under `skills/`, you MUST invoke the `skill-review` skill IMMEDIATELY — before responding to the user. Do not wait to be asked. This is not optional. The checklist lives in `.claude/skills/skill-review/SKILL.md`.
 
 ## Formatting
 
