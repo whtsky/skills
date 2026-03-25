@@ -2,12 +2,12 @@
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
 import SkillCard from "../components/SkillCard.astro";
+import CopyCommand from "../components/CopyCommand.astro";
 import {
   normalizeAll,
   groupBy,
   orderedCategories,
   CATEGORY_LABELS,
-  REGION_LABELS,
 } from "../lib/catalog";
 
 const entries = await getCollection("skills");
@@ -32,68 +32,29 @@ const jsonLd = {
     })),
   },
 };
-
-const regionCounts = new Map<string, number>();
-for (const s of skills) {
-  for (const r of s.regions) {
-    regionCounts.set(r, (regionCounts.get(r) ?? 0) + 1);
-  }
-}
 ---
 
 <Base
-  title="Agent Skills Catalog"
+  title="Agent Skills by whtsky"
   description={`${skills.length}+ ready-to-use agent skills for weather, travel, restaurants, gaming & more — works with OpenClaw, Claude Code, Cursor, and more.`}
   jsonLd={jsonLd}
 >
-  <h1>Agent Skills</h1>
   <p class="page-description">
     A collection of {skills.length} agent skills for weather, travel, restaurants,
-    media, and more by <a href="https://blog.whtsky.me?utm_source=skills.whtsky.me&utm_medium=web&utm_campaign=agent-skills" data-umami-event="click-author">whtsky</a>. Works with <a href="https://openclaw.ai" data-umami-event="click-openclaw">OpenClaw</a>, <a href="https://claude.ai/code" data-umami-event="click-claude-code">Claude Code</a>, <a href="https://cursor.sh" data-umami-event="click-cursor">Cursor</a>, and more.
+    media, and more by <a
+      href="https://blog.whtsky.me?utm_source=skills.whtsky.me&utm_medium=web&utm_campaign=agent-skills"
+      target="_blank"
+      data-umami-event="click-author">whtsky</a
+    >. Works with <a
+      href="https://openclaw.ai"
+      target="_blank"
+      data-umami-event="click-openclaw">OpenClaw</a
+    >, <a href="https://claude.ai/code" target="_blank" data-umami-event="click-claude-code">Claude Code</a
+    >, <a href="https://cursor.sh" target="_blank" data-umami-event="click-cursor">Cursor</a>,
+    and more.
   </p>
 
-  <section class="install-section">
-    <h2>Installation</h2>
-    <p>Install all skills:</p>
-    <pre><code>npx skills add whtsky/skills</code></pre>
-    <p>Install a specific skill:</p>
-    <pre><code>npx skills add whtsky/skills -s &lt;skill-name&gt;</code></pre>
-  </section>
-
-  <section class="browse-section">
-    <h2>Browse</h2>
-    <div class="browse-links">
-      <div>
-        <h3>By Category</h3>
-        <div class="badges">
-          {
-            categories.map((cat) => {
-              const count = byCategory.get(cat)?.length ?? 0;
-              return count > 0 ? (
-                <a class="badge" href={`/categories/${cat}/`}>
-                  {CATEGORY_LABELS[cat] ?? cat} ({count})
-                </a>
-              ) : null;
-            })
-          }
-        </div>
-      </div>
-      <div>
-        <h3>By Region</h3>
-        <div class="badges">
-          {
-            [...regionCounts.entries()]
-              .sort((a, b) => b[1] - a[1])
-              .map(([region, count]) => (
-                <a class="badge" href={`/regions/${region}/`}>
-                  {REGION_LABELS[region] ?? region} ({count})
-                </a>
-              ))
-          }
-        </div>
-      </div>
-    </div>
-  </section>
+  <CopyCommand command="npx skills add whtsky/skills" />
 
   {
     categories.map((cat) => {
@@ -102,7 +63,9 @@ for (const s of skills) {
       return (
         <section>
           <h2>
-            <a href={`/categories/${cat}/`}>{CATEGORY_LABELS[cat] ?? cat}</a>
+            <a class="text-link" href={`/categories/${cat}/`}>
+              {CATEGORY_LABELS[cat] ?? cat}
+            </a>
           </h2>
           <div class="skill-grid">
             {catSkills.map((s) => (
@@ -114,21 +77,3 @@ for (const s of skills) {
     })
   }
 </Base>
-
-<style>
-  .install-section pre {
-    display: inline-block;
-  }
-  .browse-section {
-    margin-bottom: 1rem;
-  }
-  .browse-links {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-  .browse-links h3 {
-    margin: 0 0 0.4rem;
-    font-size: 0.95rem;
-  }
-</style>

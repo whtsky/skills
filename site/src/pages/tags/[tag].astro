@@ -27,12 +27,12 @@ interface Props {
 }
 
 const { tag, skills } = Astro.props;
-const description = `Agent skills tagged "${tag}" — ${skills.map((s) => s.name).join(", ")}.`;
+const description = `Agent skills for ${tag} — ${skills.length} skills for AI coding agents.`;
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  name: `Skills tagged "${tag}"`,
+  name: `${tag} Agent Skills`,
   description,
   url: new URL(`/tags/${tag}/`, Astro.site).href,
   mainEntity: {
@@ -48,26 +48,11 @@ const jsonLd = {
 };
 ---
 
-<Base title={`"${tag}" Skills`} description={description} jsonLd={jsonLd}>
-  <nav class="breadcrumb">
-    <a href="/skills/">Skills</a> / <span>Tag: {tag}</span>
-  </nav>
-
-  <h1>Skills tagged &ldquo;{tag}&rdquo;</h1>
+<Base title={`${tag} Agent Skills`} description={description} jsonLd={jsonLd}>
+  <h1>{tag} Agent Skills</h1>
   <p>{skills.length} skill{skills.length !== 1 ? "s" : ""} with this tag.</p>
 
   <div class="skill-grid">
     {skills.map((s) => <SkillCard skill={s} />)}
   </div>
 </Base>
-
-<style>
-  .breadcrumb {
-    font-size: 0.85rem;
-    color: var(--color-muted);
-    margin-bottom: 1rem;
-  }
-  .breadcrumb span {
-    color: var(--color-text);
-  }
-</style>

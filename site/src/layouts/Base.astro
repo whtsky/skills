@@ -8,14 +8,14 @@ interface Props {
 }
 
 const { title, description, canonicalUrl, jsonLd, bodyLang } = Astro.props;
-const siteTitle = "Agent Skills";
+const siteTitle = "Agent Skills by whtsky";
 const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
 const canonical = canonicalUrl ?? Astro.url.href;
 const ogUrl = canonical;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" style="color-scheme: light dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -36,15 +36,23 @@ const ogUrl = canonical;
         <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
       )
     }
+
+    <!-- Umami Analytics -->
+    <script
+      defer
+      src="https://u.whtsky.me/script.js"
+      data-website-id="2d105b6e-592b-4025-adc5-ababe34e24db"></script>
   </head>
   <body>
     <header>
       <nav>
-        <a href="/" class="site-title">{siteTitle}</a>
-        <div class="nav-links">
-          <a href="/skills/">All Skills</a>
-          <a href="https://github.com/whtsky/skills">GitHub</a>
-        </div>
+        <a href="/" class="site-title text-link">{siteTitle}</a>
+        <a
+          href="https://github.com/whtsky/skills"
+          target="_blank"
+          class="nav-link"
+          data-umami-event="click-github-nav">GitHub</a
+        >
       </nav>
     </header>
     <main>
@@ -52,8 +60,15 @@ const ogUrl = canonical;
     </main>
     <footer>
       <p>
-        <a href="https://github.com/whtsky/skills">whtsky/skills</a> &mdash; a collection
-        of <a href="https://agentskills.io/">agent skills</a> for AI assistants.
+        <a
+          href="https://github.com/whtsky/skills"
+          target="_blank"
+          data-umami-event="click-github-footer">whtsky/skills</a
+        > &mdash; a collection of <a
+          href="https://agentskills.io/"
+          target="_blank"
+          data-umami-event="click-agentskills">agent skills</a
+        > for AI assistants.
       </p>
     </footer>
   </body>
@@ -61,20 +76,38 @@ const ogUrl = canonical;
 
 <style is:global>
   :root {
-    --color-bg: #fff;
-    --color-text: #1a1a1a;
-    --color-muted: #666;
-    --color-border: #e5e5e5;
-    --color-link: #0066cc;
-    --color-link-hover: #004499;
+    --color-bg: #fafafa;
+    --color-text: #2d2d2d;
+    --color-muted: #777;
+    --color-border: #e8e8e8;
+    --color-link: #2563eb;
+    --color-link-hover: #1d4ed8;
     --color-badge-bg: #f0f0f0;
-    --color-badge-text: #444;
-    --color-code-bg: #f5f5f5;
+    --color-badge-text: #555;
+    --color-code-bg: #f0f0f0;
+    --color-card-hover-border: #ccc;
+    --color-badge-hover-bg: #e4e4e4;
     --max-width: 52rem;
     --font-sans:
       system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono:
       ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: #1c1c1e;
+      --color-text: #d4d4d8;
+      --color-muted: #8b8b8f;
+      --color-border: #2c2c2e;
+      --color-link: #60a5fa;
+      --color-link-hover: #93c5fd;
+      --color-badge-bg: #27272a;
+      --color-badge-text: #a1a1aa;
+      --color-code-bg: #222224;
+      --color-card-hover-border: #3f3f46;
+      --color-badge-hover-bg: #303033;
+    }
   }
 
   * {
@@ -110,6 +143,14 @@ const ogUrl = canonical;
     text-decoration: underline;
   }
 
+  .text-link {
+    color: var(--color-text);
+  }
+  .text-link:hover {
+    color: var(--color-link);
+    text-decoration: underline;
+  }
+
   h1 {
     font-size: 1.75rem;
     margin-bottom: 0.5rem;
@@ -137,10 +178,10 @@ const ogUrl = canonical;
 
   pre {
     background: var(--color-code-bg);
-    padding: 1rem;
+    padding: 0.5rem 0.75rem;
     border-radius: 6px;
     overflow-x: auto;
-    margin: 0.75rem 0;
+    margin: 0.5rem 0;
   }
 
   pre code {
@@ -182,14 +223,10 @@ const ogUrl = canonical;
     margin: 0.75rem 0;
   }
 
-  header {
-    border-bottom: 1px solid var(--color-border);
-  }
-
   header nav {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -197,18 +234,11 @@ const ogUrl = canonical;
   }
 
   .site-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--color-text);
-  }
-  .site-title:hover {
-    color: var(--color-text);
-    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
   }
 
-  .nav-links {
-    display: flex;
-    gap: 1.25rem;
+  .nav-link {
     font-size: 0.9rem;
   }
 
@@ -230,7 +260,8 @@ const ogUrl = canonical;
     text-decoration: none;
   }
   a.badge:hover {
-    background: #e0e0e0;
+    background: var(--color-badge-hover-bg);
+    color: var(--color-badge-text);
     text-decoration: none;
   }
 

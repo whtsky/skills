@@ -11,7 +11,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "All Agent Skills",
-  description: `Browse all ${skills.length} agent skills for AI assistants.`,
+  description: `Browse all ${skills.length} agent skills — weather, travel, food, gaming & utilities for AI coding agents.`,
   url: new URL("/skills/", Astro.site).href,
   mainEntity: {
     "@type": "ItemList",
@@ -27,13 +27,13 @@ const jsonLd = {
 ---
 
 <Base
-  title="All Skills"
-  description={`Browse all ${skills.length} agent skills for AI assistants.`}
+  title="All Agent Skills"
+  description={`Browse all ${skills.length} agent skills — weather, travel, food, gaming & utilities for AI coding agents.`}
   jsonLd={jsonLd}
 >
-  <h1>All Skills</h1>
+  <h1>All Agent Skills</h1>
   <p class="page-description">
-    {skills.length} agent skills for AI assistants.
+    {skills.length} agent skills for AI coding agents.
   </p>
   <div class="skill-grid">
     {skills.map((s) => <SkillCard skill={s} />)}

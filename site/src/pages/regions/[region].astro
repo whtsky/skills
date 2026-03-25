@@ -43,12 +43,12 @@ const REGION_INTROS: Record<string, string> = {
 };
 
 const intro = REGION_INTROS[region] ?? "";
-const description = `${label} agent skills for AI assistants. ${intro}`;
+const description = `${label} agent skills for AI coding agents. ${intro}`;
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  name: `${label} Skills`,
+  name: `${label} Agent Skills`,
   description,
   url: new URL(`/regions/${region}/`, Astro.site).href,
   mainEntity: {
@@ -64,12 +64,8 @@ const jsonLd = {
 };
 ---
 
-<Base title={`${label} Skills`} description={description} jsonLd={jsonLd}>
-  <nav class="breadcrumb">
-    <a href="/skills/">Skills</a> / <span>{label}</span>
-  </nav>
-
-  <h1>{label} Skills</h1>
+<Base title={`${label} Agent Skills`} description={description} jsonLd={jsonLd}>
+  <h1>{label} Agent Skills</h1>
   {intro && <p class="page-description">{intro}</p>}
   <p>
     {skills.length} skill{skills.length !== 1 ? "s" : ""} available for this region.
@@ -79,14 +75,3 @@ const jsonLd = {
     {skills.map((s) => <SkillCard skill={s} />)}
   </div>
 </Base>
-
-<style>
-  .breadcrumb {
-    font-size: 0.85rem;
-    color: var(--color-muted);
-    margin-bottom: 1rem;
-  }
-  .breadcrumb span {
-    color: var(--color-text);
-  }
-</style>

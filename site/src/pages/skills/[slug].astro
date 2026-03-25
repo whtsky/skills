@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import CopyCommand from "../../components/CopyCommand.astro";
 import {
   normalizeSkill,
   CATEGORY_LABELS,
@@ -20,46 +21,23 @@ const { entry } = Astro.props;
 const skill: NormalizedSkill = normalizeSkill(entry);
 const { Content } = await render(entry);
 
+const skillTitle = `${skill.name} — ${skill.description.length > 60 ? skill.description.slice(0, 57) + "..." : skill.description}`;
+
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "SoftwareSourceCode",
+  "@type": "SoftwareApplication",
   name: skill.name,
   description: skill.description,
+  applicationCategory: "AI Agent Skill",
   codeRepository: skill.sourceUrl,
   keywords: skill.tags.join(", "),
 };
-
-const breadcrumbLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Skills",
-      item: new URL("/skills/", Astro.site).href,
-    },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: skill.name,
-      item: new URL(`/skills/${skill.slug}/`, Astro.site).href,
-    },
-  ],
-};
 ---
 
-<Base title={skill.name} description={skill.description} jsonLd={jsonLd}>
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
-
-  <nav class="breadcrumb">
-    <a href="/skills/">Skills</a> / <span>{skill.name}</span>
-  </nav>
-
-  <h1>{skill.name}</h1>
-  <p class="page-description">{skill.description}</p>
-
-  <div class="meta-section">
+<Base title={skillTitle} description={skill.description} jsonLd={jsonLd}>
+  <div class="skill-header">
+    <h1>{skill.name}</h1>
+    <p class="skill-description">{skill.description}</p>
     <div class="badges">
       <a class="badge" href={`/categories/${skill.category}/`}>
         {CATEGORY_LABELS[skill.category] ?? skill.category}
@@ -79,58 +57,71 @@ const breadcrumbLd = {
         ))
       }
     </div>
+
+    <div class="skill-meta">
+      <CopyCommand command={`npx skills add whtsky/skills -s ${skill.slug}`} />
+      {
+        skill.compatibility && (
+          <p class="meta-requirements">{skill.compatibility}</p>
+        )
+      }
+    </div>
   </div>
-
-  {
-    skill.compatibility && (
-      <section class="requirements">
-        <h2>Requirements</h2>
-        <p>{skill.compatibility}</p>
-      </section>
-    )
-  }
-
-  <section class="install">
-    <h2>Install</h2>
-    <pre><code>npx skills add whtsky/skills -s {skill.slug}</code></pre>
-  </section>
 
   <section
     class="skill-body"
     lang={skill.bodyLang !== "en" ? skill.bodyLang : undefined}
   >
+    <h2 class="body-heading">Documentation</h2>
     <Content />
   </section>
 
   <section class="source">
     <p>
-      <a href={skill.sourceUrl}>View source on GitHub &rarr;</a>
+      <a
+        href={skill.sourceUrl}
+        target="_blank"
+        data-umami-event="click-source"
+        data-umami-event-skill={skill.slug}>View source on GitHub &rarr;</a
+      >
     </p>
   </section>
 </Base>
 
 <style>
-  .breadcrumb {
+  .skill-header {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .skill-header h1 {
+    margin-bottom: 0.35rem;
+  }
+  .skill-description {
+    color: var(--color-muted);
+    margin-bottom: 0.75rem;
+  }
+  .skill-meta {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .meta-requirements {
     font-size: 0.85rem;
     color: var(--color-muted);
-    margin-bottom: 1rem;
-  }
-  .breadcrumb span {
-    color: var(--color-text);
-  }
-  .meta-section {
-    margin-bottom: 1.5rem;
-  }
-  .requirements {
-    margin-bottom: 1rem;
-  }
-  .install pre {
-    display: inline-block;
+    margin-bottom: 0;
   }
   .skill-body {
-    border-top: 1px solid var(--color-border);
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
+    padding-top: 0;
+    margin-top: 0;
+  }
+  .body-heading {
+    font-size: 1.1rem;
+    color: var(--color-muted);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
   }
   .source {
     margin-top: 2rem;

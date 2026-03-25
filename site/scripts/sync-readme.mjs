@@ -107,7 +107,8 @@ function generateCatalog(skills) {
     const catSkills = byCategory.get(cat);
     if (!catSkills?.length) continue;
 
-    const label = CATEGORY_LABELS[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
+    const label =
+      CATEGORY_LABELS[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
     lines.push(`### ${label}`);
     lines.push("");
     lines.push("| Skill | Region | Description | Dependencies |");
