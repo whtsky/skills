@@ -320,9 +320,9 @@ if (values.emu || isEmuTrain) {
   }
 }
 
-// 6. 普速车型查询 (RailGo) — 仅对非动车组
+// 6. 车型查询 (RailGo) — 所有车次（动车组在 api.rail.re 无数据时补充）
 let railgoInfo = null;
-if (!isEmuTrain) {
+{
   console.error("查询车型信息 (RailGo)...");
   railgoInfo = await queryRailGo(station_train_code);
   if (railgoInfo) {
