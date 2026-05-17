@@ -27,9 +27,44 @@ Check game compatibility on Steam Deck / Linux via ProtonDB APIs.
 GET https://www.protondb.com/api/v1/reports/summaries/{appid}.json
 ```
 
-Returns: `tier`, `bestReportedTier`, `trendingTier`, `score` (0-1), `confidence`, `total` (report count).
+**Status codes:**
+- `200 application/json` — game has ≥1 report
+- `404 text/html` — game has **0 reports** (returns Netlify 404 page, NOT empty JSON). Always check status before parsing.
 
-`trendingTier` reflects recent reports — if it differs from `tier`, note it as the trend may indicate recent regressions or fixes.
+Response fields:
+- `tier` — official rating (`platinum`/`gold`/`silver`/`bronze`/`borked`), or `"pending"` when `confidence: "inadequate"` (typically <5 reports)
+- `provisionalTier` — tier estimate used while `tier` is `pending`. **Fall back to this when `tier === "pending"`.**
+- `bestReportedTier` — highest tier anyone reported (optimistic)
+- `trendingTier` — recent reports' tier (may differ from `tier` → indicates regression/fix). Also can be `"pending"`.
+- `confidence` — `inadequate` / `low` / `moderate` / `high` / `strong`
+- `score` (0-1), `total` (report count)
+
+Verdict logic:
+```
+effective_tier = tier if tier != "pending" else provisionalTier
+```
+
+**A 404 here ≠ the game page is missing.** The ProtonDB web page `/app/{appid}` always exists for any valid Steam app and shows metadata + Deck Verified status even with 0 reports. Don't conflate the two — verify by browsing the page when in doubt.
+
+### ⚠️ Pitfall: summary 404 ≠ page is empty
+
+The summary API returns **404 (Netlify "Page not found" HTML)** when a game has zero user reports. This does NOT mean the ProtonDB page itself is empty or useless. `https://www.protondb.com/app/{appid}` still renders and carries data even with 0 reports:
+
+- **Deck Verified Status** (Valve's official judgement: Verified / Playable / Unsupported / Unknown) — independent of community reports, often the most important signal
+- **Chromebook Ready Status**
+- Native platform support icons
+- External links: Steam, SteamDB, Steamcharts, PCGamingWiki, GitHub Proton issue search
+
+When summary API 404s, DO NOT tell the user "the page is 404 / has no info". Instead:
+1. Open the `/app/{appid}` page (browser tool) to read Deck Verified status from the rendered HTML
+2. Report: "0 community reports, but Valve's Deck Verified status is `<status>`"
+3. Surface the PCGamingWiki and Proton GitHub issue search links — those are often where niche-game tweaks actually live
+
+Always give the user the `https://www.protondb.com/app/{appid}` URL even when reports are empty.
+
+### ⚠️ Pitfall: check every appid in a game family independently
+
+Games often have multiple Steam appids — base game, DLC, Deluxe/GOTY edition, demo. Each appid has independent ProtonDB summary results and independent Valve Deck Verified status. **Never generalize one appid's result to its siblings.** Example seen in the wild: Monobeno (758090) → 0 reports, Deck Unsupported; Monobeno -HAPPY END- Deluxe (831660) → 2 reports, Deck Verified, provisionalTier platinum. The Deluxe edition is the playable one; the base appid would have steered the user wrong. Always enumerate the family via Steam store search and check each appid before answering.
 
 ## API 2: Community Reports (Detailed)
 
@@ -146,3 +181,9 @@ Download, extract, and grep by appId. Not suitable for per-game queries but usef
 ## ProtonDB Page Link
 
 Link to the game's ProtonDB page: `https://www.protondb.com/app/{appid}`
+
+## Engine-specific setup guides
+
+When ProtonDB reports are thin or absent, fall back to engine-level setup recipes. Available references:
+
+- `references/kirikiri-krkr-on-deck.md` — Kirikiri / KirikiriZ (krkr/krkr2/krkrz) Japanese VN engine on Steam Deck: GE-Proton + protontricks recipe (quartz/lavfilters/cjkfonts), symptom→fix table, why native Linux engine replacements aren't practical.
